@@ -77,7 +77,7 @@ The server should now be running on `http://localhost:3000`.
 
 1. Open a new terminal and navigate to the frontend directory:
     ```sh
-    cd /Users/miguelgonzalez/Documents/GitHub/tech-test-fullstack-gpt/frontend
+    cd client
     ```
 
 2. Install the dependencies:
