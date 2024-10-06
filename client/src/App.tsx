@@ -12,20 +12,21 @@ export interface Task {
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [userInput, setUserInput] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   //get all tasks from server
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       const tasks = await fetch("http://localhost:3000/tasks").then((res) => {
         //Validate firts if the response is ok
         if (!res.ok) {
           throw new Error("Error fetching tasks");
         }
-
         return res.json();
       });
-
       setTasks(tasks);
+      setLoading(false);
     };
 
     fetchTasks();
@@ -39,8 +40,16 @@ function App() {
       title: userInput,
     } as Task;
 
-    const taskCreated = await createTask(newTask);
-    setTasks([...tasks, taskCreated]);
+    await createTask(
+      newTask,
+      (task) => {
+        setTasks([...tasks, task]);
+      },
+      () => {
+        console.log("Modal error message");
+      }
+    );
+
     setUserInput("");
   };
 
@@ -49,8 +58,16 @@ function App() {
       <h1>Tasks Manager</h1>
       <div className="mainWrapper">
         <form onSubmit={onSubmitForm}>
-          <label htmlFor="task">
-            Task
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              width: "100%",
+              margin: "0 auto",
+            }}
+          >
+            <label htmlFor="task">Task</label>
             <input
               name="task"
               type="text"
@@ -61,12 +78,14 @@ function App() {
                 setUserInput(e.target.value);
               }}
             />
-          </label>
-          <button type="submit">Add Task</button>
+            <button type="submit">Add Task</button>
+          </div>
         </form>
         <section>
           <h2>Tasks</h2>
-          {tasks.length === 0 ? (
+          {loading ? (
+            <p>Loading...</p>
+          ) : tasks.length === 0 ? (
             <p>No tasks available</p>
           ) : (
             <ul>
@@ -93,9 +112,21 @@ function App() {
                     </button>
                     <button
                       onClick={async () => {
-                        await deleteTask(task.id);
-                        const newTasks = tasks.filter((t) => t.id !== task.id);
-                        setTasks(newTasks);
+                        await deleteTask(
+                          task.id,
+                          (task) => {
+                            const newTasks = tasks.filter(
+                              (t) => t.id !== task.id
+                            );
+                            setTasks(newTasks);
+                          },
+                          (e) => {
+                            console.log(
+                              "Showing modal error message on delete operation"
+                            );
+                            console.log("Error returned: ", e);
+                          }
+                        );
                       }}
                     >
                       Delete
