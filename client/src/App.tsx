@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import Spinner from "./components/Spinner";
 
 import { createTask, deleteTask, completeTask } from "./api/tasks";
 
@@ -34,6 +35,7 @@ function App() {
 
   const onSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     //Hit the server to create a new task
+    setLoading(true);
     e.preventDefault();
 
     const newTask = {
@@ -51,6 +53,7 @@ function App() {
     );
 
     setUserInput("");
+    setLoading(false);
   };
 
   return (
@@ -84,7 +87,7 @@ function App() {
         <section>
           <h2>Tasks</h2>
           {loading ? (
-            <p>Loading...</p>
+            <Spinner />
           ) : tasks.length === 0 ? (
             <p>No tasks available</p>
           ) : (
@@ -112,6 +115,7 @@ function App() {
                     </button>
                     <button
                       onClick={async () => {
+                        setLoading(true);
                         await deleteTask(
                           task.id,
                           (task) => {
@@ -119,6 +123,7 @@ function App() {
                               (t) => t.id !== task.id
                             );
                             setTasks(newTasks);
+                            setLoading(false);
                           },
                           (e) => {
                             console.log(

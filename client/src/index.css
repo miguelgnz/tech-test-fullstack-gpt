@@ -98,6 +98,25 @@ li{
   grid-template-columns: 1fr 1fr;
 }
 
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #646cff;
+  font-size: 3rem; /* Increase the size of the spinner */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* media query */
 @media (max-width: 768px) {
   ul {
